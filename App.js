@@ -1,6 +1,7 @@
 import {StatusBar} from "expo-status-bar"
 import {StyleSheet, Text, View} from "react-native"
 import TextInput from "./src/components/text-input"
+import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 
 export default function App() {
@@ -16,10 +17,17 @@ export default function App() {
       <Form>
         <TextInput label="IP" />
         <TextInput label="Port" />
+        <Button className="mt-2" onClick={onConnectClicked}>
+          Connect
+        </Button>
       </Form>
       <StatusBar style="auto" />
     </View>
   )
+}
+
+const onConnectClicked = () => {
+  console.log("onConnectClicked")
 }
 
 const styles = StyleSheet.create({
