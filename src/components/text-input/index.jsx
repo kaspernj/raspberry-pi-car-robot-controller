@@ -1,13 +1,20 @@
-import {Text} from "react-native"
 import Form from "react-bootstrap/Form"
+import {v4 as uuidv4} from "uuid"
 
 export default function CustomTextInput(props) {
-  const {type, ...restProps} = props
+  const {id, type, ...restProps} = props
+  let actualId
+
+  if (id) {
+    actualId = id
+  } else {
+    actualId = uuidv4()
+  }
 
   return (
     <>
-      <Text>{props.label}</Text>
-      <Form.Control type={type || "text"} {...restProps} />
+      <Form.Label htmlFor={actualId}>{props.label}</Form.Label>
+      <Form.Control id={actualId} type={type || "text"} {...restProps} />
     </>
   )
 }
