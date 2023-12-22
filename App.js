@@ -1,25 +1,31 @@
-import Alert from "react-bootstrap/Alert"
 import Client from "./src/client"
 import {StatusBar} from "expo-status-bar"
-import {StyleSheet, Text, View} from "react-native"
-import TextInput from "./src/components/text-input"
-import Button from "react-bootstrap/Button"
-import Form from "react-bootstrap/Form"
+import {View} from "react-native"
 import {useCallback, useState} from "react"
+import {Appbar, Button, Dialog, Portal, PaperProvider, Text, TextInput} from "react-native-paper"
 
 export default function App() {
   const [error, setError] = useState(null)
+  const [ip, setIp] = useState("")
+  const [port, setPort] = useState("")
 
-  const onDismissErrorClicked = useCallback((e) => {
-    e.preventDefault()
+  const handleMore = () => {
+    console.log("handleMore")
+  }
+
+  const handleSearch = () => {
+    console.log("handleSearch")
+  }
+
+  const goBack = () => {
+    console.log("goBack")
+  }
+
+  const onDismissErrorClicked = useCallback(() => {
     setError(null)
   })
 
-  const onFormSubmit = useCallback(async (e) => {
-    e.preventDefault()
-
-    const ip = e.target.elements.ip.value
-    const port = e.target.elements.port.value
+  const onConnectPressed = useCallback(async () => {
     const client = new Client()
 
     client.setHost(ip)
@@ -35,36 +41,35 @@ export default function App() {
   })
 
   return (
-    <View style={styles.container}>
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
-        crossOrigin="anonymous"
-      />
-      <Text>Open up App.js to start working on your app!</Text>
-      {error &&
-        <Alert onClick={onDismissErrorClicked} style={{cursor: "pointer"}} variant="danger">
-          {error}
-        </Alert>
-      }
-      <Form onSubmit={onFormSubmit}>
-        <TextInput id="ip" label="IP" />
-        <TextInput id="port" label="Port" />
-        <Button className="mt-2" type="submit">
+    <PaperProvider>
+      <View>
+        <Appbar.Header>
+          <Appbar.BackAction onPress={goBack} />
+          <Appbar.Content title="Title" />
+          <Appbar.Action icon="magnify" onPress={handleSearch} />
+          <Appbar.Action icon="dots-vertical" onPress={handleMore} />
+        </Appbar.Header>
+        <Text>Open up App.js to start working on your app!</Text>
+        {error &&
+          <Portal>
+            <Dialog visible onDismiss={onDismissErrorClicked}>
+              <Dialog.Title>Alert</Dialog.Title>
+              <Dialog.Content>
+                <Text variant="bodyMedium">{error}</Text>
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button onPress={onDismissErrorClicked}>Done</Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
+        }
+        <TextInput id="ip" label="IP" onChangeText={(text) => setIp(text)} value={ip} />
+        <TextInput id="port" label="Port" onChangeText={(text) => setPort(text)} value={port} />
+        <Button onPress={onConnectPressed}>
           Connect
         </Button>
-      </Form>
-      <StatusBar style="auto" />
-    </View>
+        <StatusBar style="auto" />
+      </View>
+    </PaperProvider>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-})
