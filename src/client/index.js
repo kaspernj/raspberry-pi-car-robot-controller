@@ -1,42 +1,51 @@
+import ScoundrelClient from "../../scoundrel/javascript/src/client"
+
 export default class Client {
   connect() {
     return new Promise((resolve, reject) => {
-      try {
-        this.socket = new WebSocket(`ws://${this.host}:${this.port}`)
-      } catch (error) {
-        reject(error)
-
-        return
-      }
-
+      console.log("Setting resolve and reject")
       this.socketConnectedResolve = resolve
       this.socketConnectedReject = reject
+      this.socket = new WebSocket(`ws://${this.host}:${this.port}`)
+
+      console.log("Setting listeners on socket")
+      this.socket.addEventListener("close", this.onSocketClose)
       this.socket.addEventListener("error", this.onSocketError)
       this.socket.addEventListener("open", this.onSocketOpen)
       this.socket.addEventListener("message", this.onSocketMessage)
+
+      console.log("Done setting listeners")
     })
   }
 
-  onSocketError(event) {
+  onSocketClose = (event) => {
+    console.log("onSocketClose", event)
+  }
+
+  onSocketError = (event) => {
     console.log("onSocketError", event)
 
     if (this.socketConnectedReject) {
-      this.socketConnectedReject()
+      console.log("Reject original promise!")
+
+      this.socketConnectedReject(event)
       this.socketConnectedReject = undefined
+    } else {
+      console.log("No reject set so not forwarding")
     }
   }
 
-  onSocketMessage(event) {
+  onSocketMessage = (event) => {
     console.log("onSocketMessage", event)
   }
 
-  onSocketOpen(event) {
+  onSocketOpen = (event) => {
     if (this.socketConnectedResolve) {
       this.socketConnectedResolve()
       this.socketConnectedResolve = undefined
     }
 
-    socket.send("Hello Server!")
+    this.scoundrel = new ScoundrelClient(this.socket)
   }
 
   setHost(host) {

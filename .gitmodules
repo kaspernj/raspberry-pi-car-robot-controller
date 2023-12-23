@@ -1,0 +1,3 @@
+[submodule "scoundrel"]
+	path = scoundrel
+	url = https://github.com/kaspernj/scoundrel.git
