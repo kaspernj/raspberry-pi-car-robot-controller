@@ -5,6 +5,10 @@ import ScoundrelWebSocket from "../../scoundrel/javascript/src/client/connection
 const logger = new Logger("Raspberry Pi Car Robot Controller / Client")
 
 export default class Client {
+  constructor() {
+    this.motors = {}
+  }
+
   connect() {
     return new Promise((resolve, reject) => {
       logger.log(() => "Setting resolve and reject")

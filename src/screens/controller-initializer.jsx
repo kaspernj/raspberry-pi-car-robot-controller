@@ -1,5 +1,5 @@
 import AlertDialog from "../components/alert-dialog.jsx"
-import {getScoundrel} from "../current-client"
+import {getClient, getScoundrel} from "../current-client"
 import LoadingIndicator from "../loading-indicator"
 import {Button, PaperProvider} from "react-native-paper"
 import {useCallback, useState} from "react"
@@ -9,6 +9,7 @@ export default function ConnectInitializerScreen({navigation, route}) {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const onDismissErrorClicked = useCallback(() => setError(null))
+  const client = getClient()
   const scoundrel = getScoundrel()
 
   const onInitializePressed = async () => {
@@ -22,6 +23,13 @@ export default function ConnectInitializerScreen({navigation, route}) {
       const motorB = await buildHat.callMethodWithReference("Motor", "B")
       const motorC = await buildHat.callMethodWithReference("Motor", "C")
       const motorD = await buildHat.callMethodWithReference("Motor", "D")
+
+      client.motors.a = motorA
+      client.motors.b = motorB
+      client.motors.c = motorC
+      client.motors.d = motorD
+
+      navigation.navigate("Controller")
     } catch (error) {
       setError(error.message)
     } finally {
