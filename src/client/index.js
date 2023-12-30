@@ -1,42 +1,46 @@
+import Logger from "../logger.mjs"
 import ScoundrelClient from "../../scoundrel/javascript/src/client"
+import ScoundrelWebSocket from "../../scoundrel/javascript/src/client/connections/web-socket/index.mjs"
+
+const logger = new Logger("Raspberry Pi Car Robot Controller / Client")
 
 export default class Client {
   connect() {
     return new Promise((resolve, reject) => {
-      console.log("Setting resolve and reject")
+      logger.log(() => "Setting resolve and reject")
       this.socketConnectedResolve = resolve
       this.socketConnectedReject = reject
-      this.socket = new WebSocket(`ws://${this.host}:${this.port}`)
+      this.webSocket = new WebSocket(`ws://${this.host}:${this.port}`)
 
-      console.log("Setting listeners on socket")
-      this.socket.addEventListener("close", this.onSocketClose)
-      this.socket.addEventListener("error", this.onSocketError)
-      this.socket.addEventListener("open", this.onSocketOpen)
-      this.socket.addEventListener("message", this.onSocketMessage)
+      logger.log(() => "Setting listeners on socket")
+      this.webSocket.addEventListener("close", this.onSocketClose)
+      this.webSocket.addEventListener("error", this.onSocketError)
+      this.webSocket.addEventListener("open", this.onSocketOpen)
+      this.webSocket.addEventListener("message", this.onSocketMessage)
 
-      console.log("Done setting listeners")
+      logger.log(() => "Done setting listeners")
     })
   }
 
   onSocketClose = (event) => {
-    console.log("onSocketClose", event)
+    logger.log(() => ["onSocketClose", event])
   }
 
   onSocketError = (event) => {
-    console.log("onSocketError", event)
+    logger.log(() => ["onSocketError", event])
 
     if (this.socketConnectedReject) {
-      console.log("Reject original promise!")
+      logger.log(() => "Reject original promise!")
 
       this.socketConnectedReject(event)
       this.socketConnectedReject = undefined
     } else {
-      console.log("No reject set so not forwarding")
+      logger.log(() => "No reject set so not forwarding")
     }
   }
 
   onSocketMessage = (event) => {
-    console.log("onSocketMessage", event)
+    logger.log(() => "onSocketMessage", event)
   }
 
   onSocketOpen = (event) => {
@@ -45,7 +49,8 @@ export default class Client {
       this.socketConnectedResolve = undefined
     }
 
-    this.scoundrel = new ScoundrelClient(this.socket)
+    this.scoundrelWebSocket = new ScoundrelWebSocket(this.webSocket)
+    this.scoundrel = new ScoundrelClient(this.scoundrelWebSocket)
   }
 
   setHost(host) {

@@ -1,23 +1,32 @@
+import AlertDialog from "../components/alert-dialog.jsx"
 import {getScoundrel} from "../current-client"
 import LoadingIndicator from "../loading-indicator"
 import {Button, PaperProvider} from "react-native-paper"
-import {useState} from "react"
+import {useCallback, useState} from "react"
 import {View} from "react-native"
 
 export default function ConnectInitializerScreen({navigation, route}) {
+  const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const onDismissErrorClicked = useCallback(() => setError(null))
   const scoundrel = getScoundrel()
 
-  const onInitializePressed = () => {
+  const onInitializePressed = async () => {
     setLoading(true)
 
-    console.log("onInitializePressed")
+    try {
+      console.log("onInitializePressed")
 
-    const buildHat = scoundrel.import("buildhat")
-    const motorA = buildHat.callMethodWithReference("Motor", "A")
-    const motorB = buildHat.callMethodWithReference("Motor", "B")
-    const motorC = buildHat.callMethodWithReference("Motor", "C")
-    const motorD = buildHat.callMethodWithReference("Motor", "D")
+      const buildHat = await scoundrel.import("buildhat")
+      const motorA = await buildHat.callMethodWithReference("Motor", "A")
+      const motorB = await buildHat.callMethodWithReference("Motor", "B")
+      const motorC = await buildHat.callMethodWithReference("Motor", "C")
+      const motorD = await buildHat.callMethodWithReference("Motor", "D")
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -25,6 +34,9 @@ export default function ConnectInitializerScreen({navigation, route}) {
       <View>
         {loading &&
           <LoadingIndicator />
+        }
+        {error &&
+          <AlertDialog onDismiss={onDismissErrorClicked} text={error} title="Alert" />
         }
         <Button mode="contained" onPress={onInitializePressed}>
           Initialize
